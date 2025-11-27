@@ -1,0 +1,164 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}เมนูอาหาร - {{ table }}{% endblock %}
+
+{% block content %}
+<style>
+    .menu-header {
+        background: linear-gradient(90deg, #ff69b4, #ff1493, #ff69b4);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .category-section {
+        margin-bottom: 40px;
+    }
+    
+    .category-title {
+        color: #850d65ff;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #70027aff;
+    }
+    
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+    }
+    
+    .menu-item {
+        background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 20px;
+        transition: all 0.3s;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .menu-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        border-color: #dd0ccfff;
+    }
+    
+    .menu-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .item-name {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .item-description {
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+    
+    .item-price {
+        font-size: 1.5em;
+        color: #6c134dff;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    
+    .item-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .quantity-input {
+        width: 70px;
+        padding: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    
+    .unavailable {
+        opacity: 0.5;
+        position: relative;
+    }
+    
+    .unavailable::after {
+        content: '❌ หมด';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255,0,0,0.9);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    .current-order-badge {
+        background: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        display: inline-block;
+        margin-left: 15px;
+    }
+</style>
+
+<div class="menu-header">
+    <h2>🍽️ {{ table }} -Number of seats {{ table.capacity }} at</h2>
+    {% if current_order %}
+    <a href="{% url 'view_order' current_order.id %}" class="current-order-badge">
+        📋 View current orders ({{ current_order.items.count }} list)
+    </a>
+    {% endif %}
+</div>
+
+{% for category in categories %}
+<div class="category-section">
+    <h3 class="category-title">{{ category.name }}</h3>
+    
+    <div class="menu-grid">
+        {% for item in category.items.all %}
+        <div class="menu-item {% if not item.is_available %}unavailable{% endif %}">
+            {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.name }}">
+            {% else %}
+            <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3em; margin-bottom: 15px;">
+                🍽️
+            </div>
+            {% endif %}
+            
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-description">{{ item.description }}</div>
+            <div class="item-price">฿{{ item.price }}</div>
+            
+            {% if item.is_available %}
+            <form method="post" action="{% url 'add_to_order' table.id item.id %}" class="item-form">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="1" min="1" max="99" class="quantity-input" required>
+                <button type="submit" class="btn btn-success">add</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+<div style="text-align: center; margin-top: 40px;">
+    <a href="{% url 'home' %}" class="btn btn-secondary">← Return to home page</a>
+</div>
+{% endblock %}

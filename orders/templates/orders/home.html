@@ -1,0 +1,430 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}เลือกโต๊ะ - ระบบสั่งอาหาร{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 25%, #ffc8dd 50%, #ffd1dc 75%, #ffb6c1 100%);
+        background-size: 400% 400%;
+        animation: gradient-shift 15s ease infinite;
+    }
+    
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .hero-section {
+        text-align: center;
+        padding: 40px 20px;
+        margin-bottom: 40px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(255, 182, 193, 0.4);
+        position: relative;
+        overflow: hidden;
+        border: 3px solid #ffb6c1;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 182, 193, 0.2), transparent);
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .hero-icon {
+        font-size: 5em;
+        margin-bottom: 20px;
+        animation: float 3s ease-in-out infinite;
+        filter: drop-shadow(0 5px 15px rgba(255, 182, 193, 0.5));
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .hero-title {
+        font-size: 3em;
+        background: linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        font-weight: bold;
+        text-shadow: 0 2px 10px rgba(255, 105, 180, 0.3);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3em;
+        color: #ff69b4;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+    
+    .features {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+    
+    .feature-item {
+        background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 1.1em;
+        box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+    
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(255, 105, 180, 0.5);
+    }
+    
+    .section-title {
+        text-align: center;
+        font-size: 2.5em;
+        color: #ff1493;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+        position: relative;
+        display: inline-block;
+        left: 50%;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.3));
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, #ff69b4, #ff1493, #ff69b4);
+        border-radius: 2px;
+    }
+    
+    .tables-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .table-card {
+        background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+        padding: 40px;
+        border-radius: 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        color: white;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+        position: relative;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .table-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .table-card:hover::before {
+        opacity: 1;
+    }
+    
+    .table-card:hover {
+        transform: translateY(-15px) scale(1.05) rotate(2deg);
+        box-shadow: 0 20px 40px rgba(255, 105, 180, 0.5);
+    }
+    
+    .table-card.occupied {
+        background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
+        border-color: #ff69b4;
+    }
+    
+    .table-card.reserved {
+        background: linear-gradient(135deg, #ffd1dc 0%, #ffe4e1 100%);
+        border-color: #ffb6c1;
+        color: #ff1493;
+    }
+    
+    .table-icon {
+        font-size: 3.5em;
+        margin-bottom: 15px;
+        display: block;
+        animation: bounce 2s ease-in-out infinite;
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-15px) scale(1.1); }
+    }
+    
+    .table-number {
+        font-size: 2.8em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .table-info {
+        font-size: 1.2em;
+        margin: 12px 0;
+        opacity: 0.95;
+    }
+    
+    .table-status {
+        background: rgba(255,255,255,0.4);
+        backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: inline-block;
+        margin-top: 15px;
+        font-weight: bold;
+        font-size: 1.1em;
+        border: 2px solid rgba(255,255,255,0.6);
+    }
+    
+    .decorative-elements {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+    
+    .floating-emoji {
+        position: absolute;
+        font-size: 3em;
+        opacity: 0.3;
+        animation: float-random 20s ease-in-out infinite;
+        filter: drop-shadow(0 2px 5px rgba(255, 182, 193, 0.5));
+    }
+    
+    @keyframes float-random {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(50px, -50px) rotate(90deg); }
+        50% { transform: translate(0, -100px) rotate(180deg); }
+        75% { transform: translate(-50px, -50px) rotate(270deg); }
+    }
+    
+    .emoji-1 { top: 10%; left: 10%; animation-delay: 0s; font-size: 4em; }
+    .emoji-2 { top: 15%; right: 15%; animation-delay: 2s; font-size: 3.5em; }
+    .emoji-3 { bottom: 15%; left: 20%; animation-delay: 4s; font-size: 4em; }
+    .emoji-4 { bottom: 20%; right: 10%; animation-delay: 6s; font-size: 3.5em; }
+    .emoji-5 { top: 50%; left: 5%; animation-delay: 1s; font-size: 3em; }
+    .emoji-6 { top: 60%; right: 8%; animation-delay: 3s; font-size: 3em; }
+    
+    .heart-decoration {
+        position: absolute;
+        color: #ffb6c1;
+        font-size: 2em;
+        opacity: 0.2;
+        animation: heartbeat 2s ease-in-out infinite;
+    }
+    
+    @keyframes heartbeat {
+        0%, 100% { transform: scale(1); opacity: 0.2; }
+        50% { transform: scale(1.2); opacity: 0.4; }
+    }
+    
+    .heart-1 { top: 5%; left: 15%; animation-delay: 0s; }
+    .heart-2 { top: 10%; right: 20%; animation-delay: 0.5s; }
+    .heart-3 { bottom: 10%; left: 25%; animation-delay: 1s; }
+    .heart-4 { bottom: 15%; right: 15%; animation-delay: 1.5s; }
+    
+    .sparkle {
+        position: absolute;
+        color: #fff;
+        font-size: 1.5em;
+        animation: sparkle 3s ease-in-out infinite;
+    }
+    
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1); }
+    }
+    
+    .sparkle-1 { top: 20%; left: 30%; animation-delay: 0s; }
+    .sparkle-2 { top: 30%; right: 25%; animation-delay: 1s; }
+    .sparkle-3 { bottom: 25%; left: 35%; animation-delay: 2s; }
+    .sparkle-4 { bottom: 30%; right: 30%; animation-delay: 0.5s; }
+    
+    .content-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Cute stars background */
+    .star-decoration {
+        position: absolute;
+        color: #ffe4e1;
+        font-size: 2.5em;
+        opacity: 0.25;
+        animation: twinkle 4s ease-in-out infinite;
+    }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.25; transform: scale(1) rotate(0deg); }
+        50% { opacity: 0.5; transform: scale(1.3) rotate(180deg); }
+    }
+    
+    .star-1 { top: 8%; left: 40%; animation-delay: 0s; }
+    .star-2 { top: 40%; right: 35%; animation-delay: 1.5s; }
+    .star-3 { bottom: 35%; left: 45%; animation-delay: 2.5s; }
+</style>
+
+<div class="decorative-elements">
+    <!-- Cute emoji decorations -->
+    <div class="floating-emoji emoji-1">🧁</div>
+    <div class="floating-emoji emoji-2">🍰</div>
+    <div class="floating-emoji emoji-3">🍓</div>
+    <div class="floating-emoji emoji-4">🍪</div>
+    <div class="floating-emoji emoji-5">🥐</div>
+    <div class="floating-emoji emoji-6">🧃</div>
+    
+    <!-- Heart decorations -->
+    <div class="heart-decoration heart-1">💕</div>
+    <div class="heart-decoration heart-2">💗</div>
+    <div class="heart-decoration heart-3">💖</div>
+    <div class="heart-decoration heart-4">💝</div>
+    
+    <!-- Sparkles -->
+    <div class="sparkle sparkle-1">✨</div>
+    <div class="sparkle sparkle-2">✨</div>
+    <div class="sparkle sparkle-3">✨</div>
+    <div class="sparkle sparkle-4">✨</div>
+    
+    <!-- Stars -->
+    <div class="star-decoration star-1">⭐</div>
+    <div class="star-decoration star-2">⭐</div>
+    <div class="star-decoration star-3">⭐</div>
+</div>
+
+<div class="content-wrapper">
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="hero-icon">🌸</div>
+            <h1 class="hero-title">Welcome to the restaurant Hong Cafe & Resterent</h1>
+            <p class="hero-subtitle">✿ Choose your table and begin your unforgettable dining experience. ✿</p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span>💖</span>
+                    <span>Lovely atmosphere</span>
+                </div>
+                <div class="feature-item">
+                    <span>👨‍🍳</span>
+                    <span>professional chef</span>
+                </div>
+                <div class="feature-item">
+                    <span>🌟</span>
+                    <span>delicious food</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">🪑 ✨ Choose your table ✨</h2>
+
+    <div class="tables-grid">
+        {% for table in tables %}
+        <a href="{% url 'menu' table.id %}" class="table-card {{ table.status }}">
+            <span class="table-icon">
+                {% if table.status == 'available' %}
+                    🌸🪑
+                {% elif table.status == 'occupied' %}
+                    🌺
+                {% else %}
+                    🌼
+                {% endif %}
+            </span>
+            <div class="table-number">Table {{ table.number }}</div>
+            <div class="table-info">👥 {{ table.capacity }} seat</div>
+            <div class="table-status">
+                {% if table.status == 'available' %}
+                    ✨ Available - Ready to serve
+                {% elif table.status == 'occupied' %}
+                    💗 Someone is sitting.
+                {% else %}
+                    🌟 Already reserved
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// เพิ่ม animation เมื่อ scroll
+window.addEventListener('scroll', function() {
+    const cards = document.querySelectorAll('.table-card');
+    cards.forEach((card, index) => {
+        const cardTop = card.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (cardTop < windowHeight - 100) {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        }
+    });
+});
+
+// ตั้งค่า initial state
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.table-card');
+    cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px)';
+        card.style.transition = 'all 0.5s ease-out';
+    });
+    
+    // Trigger animation
+    window.dispatchEvent(new Event('scroll'));
+});
+</script>
+
+{% endblock %}
