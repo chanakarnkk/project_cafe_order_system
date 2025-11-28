@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+# --- ต้องเพิ่ม 2 บรรทัดนี้ ---
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -24,6 +26,7 @@ urlpatterns = [
     path('', include('orders.urls')),
 ]
 
+# --- และต้องเพิ่มส่วนนี้ต่อท้ายสุด (นอก list urlpatterns) ---
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
